@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>是否塔罗牌占卜 - Tarot09</title>
+    <meta name="description" content="通过是否问题，获得塔罗牌的指引，简单快速的占卜方式。">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <style>
+        /* 是否塔罗牌占卜页面专用样式 */
+        .header-section {
+            text-align: center;
+            padding: 40px 0 20px;
+        }
+        
+        .main-title {
+            font-size: 2.5rem;
+            color: #8CD867;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        
+        .sub-title {
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 900;
+        }
+        
+        .intro-text {
+            max-width: 800px;
+            margin: 0 auto 50px;
+            text-align: center;
+            line-height: 1.6;
+            color: #555;
+            font-size: 1.1rem;
+        }
+        
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+        
+        .option-card {
+            width: 350px;
+            background-color: #f9f9f9;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .option-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .option-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .option-subtitle {
+            font-size: 0.9rem;
+            color: #777;
+        }
+        
+        .option-image {
+            width: 100%;
+            height: 180px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .option-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .option-description {
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .option-button {
+            display: block;
+            width: 100%;
+            background-color: #8A2BE2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 0;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .option-button:hover {
+            background-color: #7926c9;
+        }
+        
+        .crown-icon {
+            color: #FFD700;
+            margin-right: 5px;
+        }
+        
+        .how-to-section {
+            max-width: 1000px;
+            margin: 0 auto 60px;
+        }
+        
+        .how-to-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .step-card {
+            width: 30%;
+            min-width: 280px;
+            background-color: #f9f9f9;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+        }
+        
+        .step-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 60px;
+            height: 60px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            color: #8A2BE2;
+        }
+        
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .step-description {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        /* 适配移动设备 */
+        @media (max-width: 768px) {
+            .options-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .option-card {
+                width: 90%;
+                max-width: 350px;
+            }
+            
+            .steps-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .step-card {
+                width: 90%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <span>🔮</span>
+                    <span>Tarot09</span>
+                </a>
+            </div>
+            
+            <button class="menu-toggle" aria-label="菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="nav-capsules">
+                <!-- 主导航胶囊 -->
+                <div class="nav-capsule main-nav-capsule">
+                    <div class="nav-menu">
+                        <ul>
+                            <li><a href="index.html" class="nav-link">首页</a></li>
+                            <li><a href="ai-taluopai.html" class="nav-link">AI塔罗占卜</a></li>
+                            <li><a href="yes-no-tarot.html" class="nav-link active">是否塔罗占卜</a></li>
+                            <li><a href="javascript:void(0)" class="nav-link premium" id="premiumLink"><i class="fas fa-crown"></i> 会员订阅</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 用户控制胶囊 -->
+                <div class="nav-capsule user-controls-capsule">
+                    <div class="user-controls">
+                        <button class="theme-toggle" aria-label="切换主题">
+                            <i class="fas fa-moon"></i>
+                            <i class="fas fa-sun"></i>
+                        </button>
+                        <button class="language-toggle" aria-label="切换语言">
+                            <i class="fas fa-globe"></i>
+                        </button>
+                        <a href="javascript:void(0)" class="user-profile">
+                            😊
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main>
+        <section class="header-section">
+            <h1 class="main-title">是否塔罗牌</h1>
+            <h2 class="sub-title">免费线上占卜</h2>
+            <p class="intro-text">
+                通过是否问题，获得塔罗牌的指引！抽取一张牌获得简单答案，或抽取三张牌深入解析 快速、直观的占卜方式，帮助您做出决定
+            </p>
+        </section>
+        
+        <section class="options-container">
+            <div class="option-card">
+                <div class="option-header">
+                    <h3 class="option-title">单牌极简指引</h3>
+                    <p class="option-subtitle">答案如种子在水晶中觉醒</p>
+                </div>
+                <div class="option-image">
+                    <img src="images/00愚者.jpg" alt="单牌塔罗牌">
+                </div>
+                <p class="option-description">
+                    心中已有明确问题？抽取单张塔罗牌，获得即时聚焦的启示与行动方向。
+                </p>
+                <a href="yes-no-question.html" class="option-button">单牌占卜</a>
+            </div>
+        </section>
+        
+        <section class="how-to-section">
+            <h2 class="how-to-title">如何进行是否塔罗牌占卜?</h2>
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3 class="step-title">准备心灵</h3>
+                    <p class="step-description">
+                        在安静的环境中，深呼吸放松。静心冥想出您想解决的是非问题，让内心与塔罗牌产生共鸣。这一步骤有助于提高是否塔罗占卜的准确性。
+                    </p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3 class="step-title">选择是否牌阵</h3>
+                    <p class="step-description">
+                        是否塔罗占卜通常使用单张牌或三张牌阵。单张牌直接回答是否问题，单张牌回答简洁直接；三张牌则提供更详细的背景信息和指引。
+                    </p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 class="step-title">提出明确问题</h3>
+                    <p class="step-description">
+                        确保您的是否问题清晰、具体。例如，"我是否适合接接这份工作?"或"现在是否是开始新关系的好时机?"。避免模糊不清的问题，以获准确的是否塔罗牌占卜结果。
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    © 2023 AI塔罗牌 - 版权所有
+                </div>
+                <div class="footer-links">
+                    <a href="javascript:void(0)">关于我们</a>
+                    <a href="javascript:void(0)">隐私政策</a>
+                    <a href="javascript:void(0)">使用条款</a>
+                    <a href="javascript:void(0)">联系我们</a>
+                    <a href="javascript:void(0)">问题反馈</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 会员订阅弹窗 -->
+    <div class="modal-overlay" id="subscriptionModal">
+        <div class="subscription-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">升级会员</h3>
+                <p class="modal-subtitle">享受无限次塔罗占卜和更多高级功能</p>
+            </div>
+            
+            <div class="plan-options">
+                <div class="plan-option" data-plan="monthly">
+                    <div class="plan-name">
+                        月度会员 <span class="plan-price">¥18.00</span>
+                    </div>
+                    <p class="plan-description">每月自动续费，随时可取消</p>
+                </div>
+                
+                <div class="plan-option selected" data-plan="quarterly">
+                    <div class="plan-name">
+                        季度会员 <span class="plan-price">¥48.00</span>
+                    </div>
+                    <p class="plan-description">每三个月自动续费，相当于每月¥16.00</p>
+                </div>
+                
+                <div class="plan-option" data-plan="yearly">
+                    <div class="plan-name">
+                        年度会员 <span class="plan-price">¥168.00</span>
+                    </div>
+                    <p class="plan-description">每年自动续费，相当于每月¥14.00，最划算</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="cancel-button" id="cancelSubscription">取消</button>
+                <button class="subscribe-button" id="confirmSubscription">确认订阅</button>
+            </div>
+            
+            <div class="term-conditions">
+                <p>订阅即表示您同意我们的服务条款和隐私政策。可在到期前24小时取消自动续订。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入订阅模块脚本 -->
+    <script src="js/subscription.js"></script>
+    <!-- 导入测试脚本 -->
+    <script src="js/test-subscription.js"></script>
+    <!-- 导入导航栏模块脚本 -->
+    <script src="js/navbar.js"></script>
+</body>
+</html> 

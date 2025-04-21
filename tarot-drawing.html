@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽取塔罗牌 - Tarot09</title>
+    <meta name="description" content="左右滑动选择与您能量感应最强的塔罗牌，获取命运指引。">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <style>
+        /* 塔罗牌抽取页面专用样式 */
+        .drawing-header {
+            text-align: center;
+            padding: 30px 0 15px;
+        }
+        
+        .drawing-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+        
+        .tarot-highlight {
+            color: #FF69B4;
+            font-weight: 700;
+        }
+        
+        .drawing-subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        /* 在线抽牌按钮 */
+        .online-drawing-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #8A2BE2;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin: 0 auto 30px;
+            width: fit-content;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(138, 43, 226, 0.2);
+        }
+        
+        .online-drawing-btn:hover {
+            background-color: #7926c9;
+            transform: translateY(-2px);
+        }
+        
+        .shuffle-icon {
+            font-size: 1.2rem;
+        }
+        
+        /* 卡牌滑动区域 */
+        .cards-slider-container {
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
+            margin: 0 auto 40px;
+            padding: 20px 0;
+        }
+        
+        /* 堆叠卡牌区域样式 */
+        .cards-stack-container {
+            position: relative;
+            width: 95%;
+            max-width: 1200px;
+            height: 650px; /* 增加高度从500px到650px */
+            margin: 20px auto 40px;
+            perspective: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* 改为顶部对齐 */
+            padding-top: 50px; /* 添加顶部内边距，使牌堆上移 */
+            overflow: hidden;
+            border: 2px solid #6541A5; /* 添加基础边框 */
+            border-radius: 20px; /* 圆角边框 */
+            background: linear-gradient(to bottom, rgba(28, 19, 71, 0.1), rgba(138, 43, 226, 0.05)); /* 渐变背景 */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15); /* 阴影效果 */
+            position: relative;
+            /* 移除拖动指针样式 */
+        }
+        
+      
+        
+        /* 添加星星装饰 - 使用伪元素 */
+        .cards-stack-container::before,
+        .cards-stack-container::after {
+            content: "";
+            position: absolute;
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+        
+        /* 左上角月亮装饰 */
+        .cards-stack-container::before {
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background-image: radial-gradient(circle at 30% 30%, transparent 50%, #ffd700 51%, transparent 52%),
+                              radial-gradient(circle at 70% 70%, #ffd700 10%, transparent 20%);
+            opacity: 0.7;
+        }
+        
+        /* 右上角星星装饰 */
+        .cards-stack-container::after {
+            top: 15px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            background-image: 
+                radial-gradient(circle at 20% 20%, #ffd700 2px, transparent 3px),
+                radial-gradient(circle at 40% 60%, #ffd700 3px, transparent 4px),
+                radial-gradient(circle at 70% 30%, #ffd700 4px, transparent 5px),
+                radial-gradient(circle at 90% 80%, #ffd700 2px, transparent 3px),
+                radial-gradient(circle at 10% 90%, #ffd700 3px, transparent 4px);
+            opacity: 0.8;
+        }
+        
+        /* 添加额外的星星装饰 */
+        .stars-decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none; /* 确保不会干扰卡牌点击 */
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: #ffd700;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: twinkle 4s infinite alternate;
+        }
+        
+        .star:nth-child(1) { top: 15%; left: 10%; animation-delay: 0s; }
+        .star:nth-child(2) { top: 25%; left: 85%; animation-delay: 0.5s; }
+        .star:nth-child(3) { top: 65%; left: 20%; animation-delay: 1s; }
+        .star:nth-child(4) { top: 80%; left: 70%; animation-delay: 1.5s; }
+        .star:nth-child(5) { top: 40%; left: 90%; animation-delay: 2s; }
+        .star:nth-child(6) { top: 30%; left: 25%; animation-delay: 2.5s; }
+        .star:nth-child(7) { top: 75%; left: 40%; animation-delay: 3s; }
+        .star:nth-child(8) { top: 90%; left: 10%; animation-delay: 3.5s; }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.5); }
+            100% { opacity: 0.2; transform: scale(1); }
+        }
+        
+        /* 添加月相图案 */
+        .moon-phase {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #1c1347 50%, #ffd700 50%);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            opacity: 0.7;
+            pointer-events: none; /* 确保不会干扰卡牌点击 */
+            z-index: 1;
+        }
+        
+        .cards-stack {
+            position: relative;
+            width: 150px;
+            height: 220px;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            cursor: pointer;
+            margin-top: 30px; /* 添加上边距，让牌堆更靠上 */
+        }
+        
+        .cards-stack.expanded {
+            width: 100%;
+            cursor: default;
+            margin-top: 0; /* 展开后取消上边距 */
+        }
+        
+        .tarot-card {
+            position: absolute;
+            width: 130px;
+            height: 200px;
+            background-color: #1c1347; /* 深蓝色背景 */
+            border: 5px solid #a897c2; /* 淡紫色边框 */
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25); /* 增强阴影效果 */
+            transition: all 0.5s ease;
+            backface-visibility: hidden;
+            transform-origin: center center;
+            background-image: url('images/背面A.jpg'); /* 使用新的卡背图片 */
+            background-size: cover; /* 确保图片覆盖整个卡牌 */
+            background-position: center; /* 居中显示图片 */
+            overflow: hidden; /* 确保图片不会溢出卡牌边界 */
+        }
+        
+        /* 增强卡牌背面的复杂度，使其更像塔罗牌 */
+        .tarot-card::before {
+            content: "";
+            position: absolute;
+            width: 95%;
+            height: 95%;
+            top: 2.5%;
+            left: 2.5%;
+            border: 2px solid rgba(255, 215, 0, 0.5); /* 增强金色边框 */
+            box-sizing: border-box;
+            border-radius: 6px; /* 添加圆角 */
+            z-index: 1;
+        }
+        
+        /* 添加星星图案点缀 */
+        /*
+        .tarot-card-stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.6) 1px, transparent 2px),
+                radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.6) 1px, transparent 2px),
+                radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.6) 1px, transparent 2px),
+                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.6) 1px, transparent 2px),
+                radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.8) 2px, transparent 3px);
+            z-index: 3;
+        }
+        
+        /* 添加月相图案 */
+        .tarot-card-moon {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #1c1347 50%, rgba(255, 215, 0, 0.4) 50%);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            z-index: 3;
+        }
+        
+        /* 添加卡牌底部神秘符号 */
+        .tarot-card-symbol {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background-image: 
+                linear-gradient(0deg, transparent 45%, rgba(255, 215, 0, 0.4) 45%, rgba(255, 215, 0, 0.4) 55%, transparent 55%),
+                linear-gradient(90deg, transparent 45%, rgba(255, 215, 0, 0.4) 45%, rgba(255, 215, 0, 0.4) 55%, transparent 55%);
+            border-radius: 50%;
+            z-index: 3;
+        }
+        */
+        
+        .tarot-card.selected {
+            pointer-events: none;
+        }
+        
+        .cards-counter {
+            display: none;
+        }
+        
+        .cards-slider {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px 5%;
+            box-sizing: border-box;
+            /* 隐藏滚动条但保留功能 */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        .cards-slider::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
+        .slider-card {
+            flex: 0 0 auto;
+            width: 130px;
+            height: 200px;
+            margin-right: 15px;
+            scroll-snap-align: center;
+            background-color: #33084d;
+            border: 8px solid #6c4675;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .slider-card:last-child {
+            margin-right: 5%;
+        }
+        
+        .slider-card:hover, .slider-card.active {
+            transform: translateY(-15px);
+        }
+        
+        .slider-card::before {
+            content: "♦";
+            color: #ffd700;
+            font-size: 2rem;
+        }
+        
+        .slider-card::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            border: 2px solid #ffd700;
+            border-radius: 5px;
+        }
+        
+        /* 滑动条 */
+        .slider-track {
+            width: 60%;
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+        
+        .slider-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 30%;
+            background-color: #8A2BE2;
+            border-radius: 3px;
+        }
+        
+        /* 重新抽牌按钮 */
+        .redraw-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            margin: 0 auto 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: fit-content;
+        }
+        
+        .redraw-button:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .redraw-icon {
+            color: #8A2BE2;
+        }
+        
+        /* 牌位展示区域 - 重新定位到扇形内部 */
+        .card-positions {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            flex-wrap: nowrap; /* 防止换行 */
+            gap: 15px;
+            width: 80%;
+            margin: 0 auto 20px;
+            z-index: 900; /* 确保在卡牌上方 */
+        }
+        
+        .card-position {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90px; /* 缩小宽度 */
+        }
+        
+        .position-placeholder {
+            width: 70px; /* 缩小宽度 */
+            height: 110px; /* 缩小高度 */
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.7); /* 半透明白色背景 */
+        }
+        
+        .position-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.7); /* 半透明白色背景 */
+            padding: 2px 5px;
+            border-radius: 10px;
+        }
+        
+        /* 塔罗牌解读子界面样式 */
+        .reading-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .reading-container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, #1c1347 0%, #32236e 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            color: #fff;
+            position: relative;
+        }
+        
+        .reading-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .reading-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        
+        .reading-question {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #d0d0d0;
+            margin-bottom: 15px;
+        }
+        
+        .reading-date {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+        }
+        
+        .cards-summary {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .card-summary {
+            width: 18%;
+            min-width: 120px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 15px 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-summary img {
+            width: 80px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .card-name {
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+        
+        .card-position-name {
+            font-size: 0.8rem;
+            color: #a0a0a0;
+        }
+        
+        .reading-conversation {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .conversation-title {
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        
+        .chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message-tarot {
+            align-self: flex-start;
+            background: rgba(138, 43, 226, 0.4);
+            border-radius: 15px 15px 15px 0;
+            padding: 12px 15px;
+            max-width: 80%;
+            margin-bottom: 5px;
+        }
+        
+        .message-user {
+            align-self: flex-end;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 15px 15px 0 15px;
+            padding: 12px 15px;
+            max-width: 80%;
+            margin-bottom: 5px;
+            text-align: right;
+        }
+        
+        .message-info {
+            font-size: 0.7rem;
+            color: #a0a0a0;
+        }
+        
+        .message-tarot-info {
+            align-self: flex-start;
+        }
+        
+        .message-user-info {
+            align-self: flex-end;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: rgba(255, 215, 0, 0.7);
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, #8A2BE2 0%, #4B0082 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        
+        .send-button:hover {
+            background: linear-gradient(135deg, #9b4dff 0%, #6c2eb1 100%);
+            transform: translateY(-2px);
+        }
+        
+        .reading-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .action-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 10px 20px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 215, 0, 0.7);
+        }
+        
+        .action-icon {
+            font-size: 1.2rem;
+        }
+        
+        .close-reading {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #a0a0a0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .close-reading:hover {
+            color: #fff;
+        }
+        
+        @media (max-width: 768px) {
+            .reading-container {
+                width: 95%;
+                padding: 20px 15px;
+                margin: 20px auto;
+            }
+            
+            .cards-summary {
+                justify-content: center;
+            }
+            
+            .card-summary {
+                width: 40%;
+                min-width: 100px;
+                margin-bottom: 15px;
+            }
+            
+            .reading-title {
+                font-size: 1.6rem;
+            }
+            
+            .reading-question {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <span>🔮</span>
+                    <span>Tarot09</span>
+                </a>
+            </div>
+            
+            <button class="menu-toggle" aria-label="菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="nav-capsules">
+                <!-- 主导航胶囊 -->
+                <div class="nav-capsule main-nav-capsule">
+                    <div class="nav-menu">
+                        <ul>
+                            <li><a href="index.html" class="nav-link">首页</a></li>
+                            <li><a href="ai-taluopai.html" class="nav-link active">AI塔罗占卜</a></li>
+                            <li><a href="yes-no-tarot.html" class="nav-link">是否塔罗占卜</a></li>
+                            <li><a href="javascript:void(0)" class="nav-link premium" id="premiumLink"><i class="fas fa-crown"></i> 会员订阅</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 用户控制胶囊 -->
+                <div class="nav-capsule user-controls-capsule">
+                    <div class="user-controls">
+                        <button class="theme-toggle" aria-label="切换主题">
+                            <i class="fas fa-moon"></i>
+                            <i class="fas fa-sun"></i>
+                        </button>
+                        <button class="language-toggle" aria-label="切换语言">
+                            <i class="fas fa-globe"></i>
+                        </button>
+                        <a href="javascript:void(0)" class="user-profile">
+                            😊
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main>
+        <section class="drawing-header">
+            <div class="container">
+                <h1 class="drawing-title">
+                    抽取您的 <span class="tarot-highlight">塔罗牌</span>
+                </h1>
+                <p class="drawing-subtitle">点击牌堆抽取与您能量感应最强的卡牌</p>
+            </div>
+        </section>
+        
+        <!-- 在线抽牌按钮 -->
+        <div class="online-drawing-btn" id="onlineDrawingBtn">
+            <i class="fas fa-random shuffle-icon"></i>
+            <span>在线抽牌</span>
+        </div>
+        
+        <!-- 卡牌堆叠区域 -->
+        <div class="cards-stack-container">
+            <div class="cards-stack" id="cardsStack">
+                <!-- 78张卡牌将通过JS动态生成 -->
+            </div>
+            
+            <!-- 添加星星装饰 -->
+            <div class="stars-decoration">
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+            </div>
+            
+            <!-- 添加月相图案 -->
+            <div class="moon-phase"></div>
+            
+            <!-- 牌位展示区域 - 移动到卡牌容器内部 -->
+            <div class="card-positions">
+                <div class="card-position">
+                    <div class="position-placeholder" id="position1"></div>
+                    <div class="position-label">当前状态</div>
+                </div>
+                <div class="card-position">
+                    <div class="position-placeholder" id="position2"></div>
+                    <div class="position-label">未来发展</div>
+                </div>
+                <div class="card-position">
+                    <div class="position-placeholder" id="position3"></div>
+                    <div class="position-label">障碍</div>
+                </div>
+                <div class="card-position">
+                    <div class="position-placeholder" id="position4"></div>
+                    <div class="position-label">最后结果</div>
+                </div>
+                <div class="card-position">
+                    <div class="position-placeholder" id="position5"></div>
+                    <div class="position-label">建议</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 重新抽牌按钮 -->
+        <button class="redraw-button" id="redrawButton">
+            <i class="fas fa-sync-alt redraw-icon"></i>
+            <span>重新洗牌</span>
+        </button>
+    </main>
+
+    <!-- 塔罗牌解读子界面 -->
+    <div class="reading-modal" id="readingModal">
+        <div class="reading-container">
+            <button class="close-reading" id="closeReading">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="reading-header">
+                <h2 class="reading-title">您的塔罗牌解读</h2>
+                <div class="reading-question" id="readingQuestion">您的问题: 未来一个月的事业发展如何？</div>
+                <div class="reading-date" id="readingDate">2023年12月30日 19:42</div>
+            </div>
+            
+            <div class="cards-summary" id="cardsSummary">
+                <!-- 卡牌总结区域将通过JS动态生成 -->
+            </div>
+            
+            <div class="reading-conversation">
+                <h3 class="conversation-title">塔罗解读对话</h3>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <!-- 聊天消息将通过JS动态生成 -->
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="输入您的问题或回应...">
+                    <button class="send-button" id="sendMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="reading-actions">
+                <button class="action-button" id="saveReading">
+                    <i class="fas fa-save action-icon"></i>
+                    保存解读
+                </button>
+                <button class="action-button" id="shareReading">
+                    <i class="fas fa-share-alt action-icon"></i>
+                    分享
+                </button>
+                <button class="action-button" id="newReading">
+                    <i class="fas fa-redo action-icon"></i>
+                    重新抽牌
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    © 2023 AI塔罗牌 - 版权所有
+                </div>
+                <div class="footer-links">
+                    <a href="javascript:void(0)">关于我们</a>
+                    <a href="javascript:void(0)">隐私政策</a>
+                    <a href="javascript:void(0)">使用条款</a>
+                    <a href="javascript:void(0)">联系我们</a>
+                    <a href="javascript:void(0)">问题反馈</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 会员订阅弹窗 -->
+    <div class="modal-overlay" id="subscriptionModal">
+        <div class="subscription-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">升级会员</h3>
+                <p class="modal-subtitle">享受无限次塔罗占卜和更多高级功能</p>
+            </div>
+            
+            <div class="plan-options">
+                <div class="plan-option" data-plan="monthly">
+                    <div class="plan-name">
+                        月度会员 <span class="plan-price">¥18.00</span>
+                    </div>
+                    <p class="plan-description">每月自动续费，随时可取消</p>
+                </div>
+                
+                <div class="plan-option selected" data-plan="quarterly">
+                    <div class="plan-name">
+                        季度会员 <span class="plan-price">¥48.00</span>
+                    </div>
+                    <p class="plan-description">每三个月自动续费，相当于每月¥16.00</p>
+                </div>
+                
+                <div class="plan-option" data-plan="yearly">
+                    <div class="plan-name">
+                        年度会员 <span class="plan-price">¥168.00</span>
+                    </div>
+                    <p class="plan-description">每年自动续费，相当于每月¥14.00，最划算</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="cancel-button" id="cancelSubscription">取消</button>
+                <button class="subscribe-button" id="confirmSubscription">确认订阅</button>
+            </div>
+            
+            <div class="term-conditions">
+                <p>订阅即表示您同意我们的服务条款和隐私政策。可在到期前24小时取消自动续订。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入订阅模块脚本 -->
+    <script src="js/subscription.js"></script>
+    <!-- 导入测试脚本 -->
+    <script src="js/test-subscription.js"></script>
+    <!-- 导入导航栏模块脚本 -->
+    <script src="js/navbar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const cardsStack = document.getElementById('cardsStack');
+            const onlineDrawingBtn = document.getElementById('onlineDrawingBtn');
+            const redrawButton = document.getElementById('redrawButton');
+            const positions = [
+                document.getElementById('position1'),
+                document.getElementById('position2'),
+                document.getElementById('position3'),
+                document.getElementById('position4'),
+                document.getElementById('position5')
+            ];
+            
+            // 定义不同牌阵的牌位名称
+            const spreadConfigs = {
+                'three-card': {
+                    title: '三牌阵',
+                    labels: ['过去', '现在', '未来'],
+                    maxCards: 3
+                },
+                'cross': {
+                    title: '十字牌阵',
+                    labels: ['核心问题', '阻碍', '当前状态', '影响', '可能结果'],
+                    maxCards: 5
+                },
+                'five-card': {
+                    title: '发展牌阵',
+                    labels: ['当前状态', '未来发展', '障碍', '最后结果', '建议'],
+                    maxCards: 5
+                }
+            };
+            
+            // 获取URL中的牌阵类型参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const spreadType = urlParams.get('spread') || 'five-card'; // 默认为五卡牌阵
+            
+            // 当前牌阵配置
+            const currentSpreadConfig = spreadConfigs[spreadType] || spreadConfigs['five-card'];
+            
+            // 最大可选卡牌数量（根据牌阵类型）
+            const maxCards = currentSpreadConfig.maxCards;
+            
+            // 根据牌阵类型设置牌位标签
+            function initCardPositions() {
+                const cardPositions = document.querySelector('.card-positions');
+                
+                // 如果是三牌阵，隐藏额外的两个牌位
+                if (spreadType === 'three-card') {
+                    // 只显示前三个牌位
+                    for (let i = 0; i < positions.length; i++) {
+                        const parent = positions[i].parentElement;
+                        if (i < 3) {
+                            parent.style.display = 'flex';
+                            // 更新标签
+                            parent.querySelector('.position-label').textContent = currentSpreadConfig.labels[i];
+                        } else {
+                            parent.style.display = 'none';
+                        }
+                    }
+                } else {
+                    // 对于五卡牌阵，显示全部牌位
+                    for (let i = 0; i < positions.length; i++) {
+                        positions[i].parentElement.style.display = 'flex';
+                        // 更新标签
+                        positions[i].parentElement.querySelector('.position-label').textContent = currentSpreadConfig.labels[i];
+                    }
+                }
+            }
+            
+            // 初始化牌位
+            initCardPositions();
+            
+            // 塔罗牌数据
+            const tarotData = {
+                // 大阿卡纳牌 - 22张
+                majorArcana: [
+                    "愚人", "魔法师", "女祭司", "皇后", "皇帝", "教皇", "恋人", "战车", 
+                    "力量", "隐士", "命运之轮", "正义", "倒吊人", "死神", "节制", "恶魔", 
+                    "高塔", "星星", "月亮", "太阳", "审判", "世界"
+                ],
+                // 小阿卡纳牌 - 56张
+                minorArcana: {
+                    suits: ["权杖", "圣杯", "宝剑", "星币"],
+                    values: ["Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "侍卫", "骑士", "王后", "国王"]
+                }
+            };
+            
+            // 卡牌名称映射到图片文件名
+            const cardImageMapping = {
+                // 大阿卡纳牌映射
+                "愚人": "00愚者.jpg",
+                "魔法师": "01魔术师.jpg",
+                "女祭司": "02女祭祀.jpg",
+                "皇后": "03皇后.jpg",
+                "皇帝": "04皇帝.jpg",
+                "教皇": "05教皇.jpg",
+                "恋人": "06恋人.jpg",
+                "战车": "07战车.jpg",
+                "力量": "08力量.jpg",
+                "隐士": "09隐士.jpg",
+                "命运之轮": "10命运之轮.jpg",
+                "正义": "11正义.jpg",
+                "倒吊人": "12倒吊人.jpg",
+                "死神": "13死神.jpg",
+                "节制": "14节制.jpg",
+                "恶魔": "15恶魔.jpg",
+                "高塔": "16高塔.jpg",
+                "星星": "17星星.jpg",
+                "月亮": "18月亮.jpg",
+                "太阳": "19太阳.jpg",
+                "审判": "20审判.jpg",
+                "世界": "21世界.jpg",
+                
+                // 小阿卡纳牌映射 - 权杖
+                "权杖Ace": "权杖ACE.jpg",
+                "权杖2": "权杖2.jpg",
+                "权杖3": "权杖3.jpg",
+                "权杖4": "权杖4.jpg",
+                "权杖5": "权杖5.jpg",
+                "权杖6": "权杖6.jpg",
+                "权杖7": "权杖7.jpg",
+                "权杖8": "权杖8.jpg",
+                "权杖9": "权杖9.jpg",
+                "权杖10": "权杖10.jpg",
+                "权杖侍卫": "权杖侍卫.jpg",
+                "权杖骑士": "权杖骑士.jpg",
+                "权杖王后": "权杖王后.jpg",
+                "权杖国王": "权杖国王.jpg",
+                
+                // 小阿卡纳牌映射 - 圣杯
+                "圣杯Ace": "圣杯ACE.jpg",
+                "圣杯2": "圣杯2.jpg",
+                "圣杯3": "圣杯3.jpg",
+                "圣杯4": "圣杯4.jpg",
+                "圣杯5": "圣杯5.jpg",
+                "圣杯6": "圣杯6.jpg",
+                "圣杯7": "圣杯7.jpg",
+                "圣杯8": "圣杯8.jpg",
+                "圣杯9": "圣杯9.jpg",
+                "圣杯10": "圣杯10.jpg",
+                "圣杯侍卫": "圣杯侍卫.jpg",
+                "圣杯骑士": "圣杯骑士.jpg",
+                "圣杯王后": "圣杯王后.jpg",
+                "圣杯国王": "圣杯国王.jpg",
+                
+                // 小阿卡纳牌映射 - 宝剑
+                "宝剑Ace": "宝剑ACE.jpg",
+                "宝剑2": "宝剑2.jpg",
+                "宝剑3": "宝剑3.jpg",
+                "宝剑4": "宝剑4.jpg",
+                "宝剑5": "宝剑5.jpg",
+                "宝剑6": "宝剑6.jpg",
+                "宝剑7": "宝剑7.jpg",
+                "宝剑8": "宝剑8.jpg",
+                "宝剑9": "宝剑9.jpg",
+                "宝剑10": "宝剑10.jpg",
+                "宝剑侍卫": "宝剑侍卫.jpg",
+                "宝剑骑士": "宝剑骑士.jpg",
+                "宝剑王后": "宝剑王后.jpg",
+                "宝剑国王": "宝剑国王.jpg",
+                
+                // 小阿卡纳牌映射 - 星币
+                "星币Ace": "星币ACE.jpg",
+                "星币2": "星币2.jpg",
+                "星币3": "星币3.jpg",
+                "星币4": "星币4.jpg",
+                "星币5": "星币5.jpg",
+                "星币6": "星币6.jpg",
+                "星币7": "星币7.jpg",
+                "星币8": "星币8.jpg",
+                "星币9": "星币9.jpg",
+                "星币10": "星币10.jpg",
+                "星币侍卫": "星币侍卫.jpg",
+                "星币骑士": "星币骑士.jpg",
+                "星币王后": "星币王后.jpg",
+                "星币国王": "星币国王.jpg"
+            };
+            
+            // 获取卡牌图片文件名
+            function getCardImageFilename(cardName) {
+                if (cardImageMapping[cardName]) {
+                    return `images/${cardImageMapping[cardName]}`;
+                } else {
+                    console.warn(`未找到卡牌 "${cardName}" 对应的图片`);
+                    return null;
+                }
+            }
+            
+            // 创建完整的塔罗牌数组
+            const allTarotCards = [];
+            
+            // 添加大阿卡纳牌
+            tarotData.majorArcana.forEach(card => {
+                allTarotCards.push(card);
+            });
+            
+            // 添加小阿卡纳牌
+            tarotData.minorArcana.suits.forEach(suit => {
+                tarotData.minorArcana.values.forEach(value => {
+                    allTarotCards.push(`${suit}${value}`);
+                });
+            });
+            
+            // 当前已选卡牌数量
+            let selectedCount = 0;
+            // 总卡牌数量
+            const totalCards = 78;
+            // 牌堆展示数量
+            const visibleCards = 78; 
+            // 追踪牌堆是否已展开
+            let isExpanded = false;
+            // 保存已选择的塔罗牌
+            const selectedTarotCards = [];
+            // 初始化圆形布局旋转角度
+            let currentRotation = 0;
+            
+            // 生成塔罗牌
+            function generateCards(count) {
+                cardsStack.innerHTML = '';
+                cardsStack.classList.remove('expanded');
+                isExpanded = false;
+                
+                // 只生成可见的卡牌数量
+                for (let i = 0; i < Math.min(count, visibleCards); i++) {
+                    const card = document.createElement('div');
+                    card.className = 'tarot-card';
+                    card.setAttribute('data-index', i);
+                    
+                    // 设置堆叠效果
+                    card.style.transform = `translateX(${i * 0.5}px) translateY(${i * 0.5}px)`;
+                    card.style.zIndex = i;
+                    
+                    card.addEventListener('click', function(e) {
+                        // 如果牌堆未展开，先展开
+                        if (!isExpanded) {
+                            expandCards();
+                            e.stopPropagation(); // 阻止传播，避免立即选牌
+                            return;
+                        }
+                        
+                        // 如果已展开且未达到选择上限，选择卡牌
+                        if (selectedCount < maxCards) {
+                            selectCard(this);
+                        }
+                    });
+                    
+                    cardsStack.appendChild(card);
+                }
+                
+                // 添加点击整个牌堆的事件来展开卡牌
+                cardsStack.addEventListener('click', function(e) {
+                    if (!isExpanded && e.target === this) {
+                        expandCards();
+                    }
+                });
+            }
+            
+            // 展开卡牌
+            function expandCards() {
+                if (isExpanded) return;
+                
+                cardsStack.classList.add('expanded');
+                isExpanded = true;
+                
+                const cards = document.querySelectorAll('.tarot-card');
+                const cardWidth = 130; // 卡牌宽度
+                const cardHeight = 200; // 卡牌高度
+                const containerWidth = cardsStack.parentElement.clientWidth;
+                const containerHeight = cardsStack.parentElement.clientHeight;
+                
+                // 修改布局参数，将圆心移至模块下边缘中心处
+                const centerX = containerWidth * 0.5; // 圆心水平居中
+                const centerY = containerHeight + 50; // 圆心设置在容器底部下方
+                
+                // 自动计算最佳半径以确保卡牌不超出界面
+                const maxVisibleWidth = containerWidth * 0.9; // 留有边距
+                const maxVisibleHeight = containerHeight * 0.9; // 留有上下边距
+                
+                // 根据容器尺寸和卡牌数量计算合适的角度范围
+                const cardCount = Math.min(78, cards.length); // 最多显示78张卡牌
+                
+                // 设置为150度的扇形弧度，单边堆叠
+                const middleAngle = 270; // 中心角度（正下方）
+                const halfSpan = 75; // 半跨度为75度，总跨度为150度
+                const startAngle = middleAngle - halfSpan; // 起始角度（195度）
+                const endAngle = middleAngle + halfSpan; // 结束角度（345度）
+                const angleSpan = endAngle - startAngle; // 角度范围，150度
+                const angleStep = angleSpan / (cardCount - 1); // 相邻卡牌的角度差
+                
+                // 计算合适的半径，确保卡牌不会超出边界
+                const radius = Math.min(containerWidth * 0.7, containerHeight * 0.8); // 确保扇形不会太大
+                
+                console.log(`展开卡牌：容器宽度=${containerWidth}, 容器高度=${containerHeight}, 卡牌数量=${cardCount}`);
+                console.log(`布局参数：中心X=${centerX}, 中心Y=${centerY}, 半径=${radius}, 角度范围=${startAngle}°-${endAngle}°`);
+                
+                // 先移动卡牌位置区域到容器底部
+                const cardPositions = document.querySelector('.card-positions');
+                if (cardPositions) {
+                    cardPositions.style.position = 'absolute';
+                    cardPositions.style.bottom = '40px';
+                    cardPositions.style.left = '50%';
+                    cardPositions.style.transform = 'translateX(-50%)';
+                    cardPositions.style.zIndex = '900';
+                }
+                
+                // 更新卡牌位置
+                cards.forEach((card, index) => {
+                    if (index >= cardCount) {
+                        // 隐藏多余的卡牌
+                        card.style.display = 'none';
+                        return;
+                    }
+                    
+                    // 添加额外的装饰元素使牌背更复杂
+                    /*
+                    if (!card.querySelector('.tarot-card-stars')) {
+                        const stars = document.createElement('div');
+                        stars.className = 'tarot-card-stars';
+                        card.appendChild(stars);
+                        
+                        const moon = document.createElement('div');
+                        moon.className = 'tarot-card-moon';
+                        card.appendChild(moon);
+                        
+                        const symbol = document.createElement('div');
+                        symbol.className = 'tarot-card-symbol';
+                        card.appendChild(symbol);
+                    }
+                    */
+                    
+                    // 计算每张卡的角度，角度越大越靠右堆叠
+                    const angle = startAngle + (index * angleStep);
+                    const radian = (angle * Math.PI) / 180;
+                    
+                    // 计算卡牌位置
+                    const x = centerX + radius * Math.cos(radian) - (cardWidth / 2);
+                    const y = centerY + radius * Math.sin(radian) - cardHeight - 20; // 调整高度
+                    
+                    // 计算堆叠效果，使卡牌从左到右堆叠
+                    // 角度范围被分为两部分，左侧扇区角度较小，右侧扇区角度较大
+                    const normalizedAngle = (angle - startAngle) / angleSpan; // 0到1之间的值
+                    
+                    // 堆叠偏移值，使堆叠更明显
+                    let stackOffset = 0;
+                    
+                    // 右侧卡牌（300-345度区域）向上堆叠
+                    if (angle > 300) {
+                        stackOffset = ((angle - 300) / 45) * 30; // 最大偏移30px
+                    }
+                    // 左侧卡牌（195-240度区域）向上堆叠，但幅度较小
+                    else if (angle < 240) {
+                        stackOffset = ((240 - angle) / 45) * 15; // 最大偏移15px
+                    }
+                    
+                    // 减小旋转幅度，使卡牌更加平行
+                    // 靠近扇形两侧的卡牌旋转角度更小，中间位置的卡牌旋转角度更接近原始角度
+                    let rotationFactor = 0.15; // 基本旋转因子
+                    if (angle < 240 || angle > 300) {
+                        rotationFactor = 0.1; // 两侧的卡牌旋转更小
+                    }
+                    const rotationDeg = (angle - 270) * rotationFactor;
+                    
+                    // 设置卡牌样式
+                    card.style.left = `${x}px`;
+                    card.style.top = `${y - stackOffset}px`; // 添加堆叠偏移
+                    card.style.transform = `rotate(${rotationDeg}deg)`;
+                    card.style.transformOrigin = 'center center';
+                    card.style.zIndex = 100 + Math.floor(normalizedAngle * 100); // z-index随角度增加
+                    card.style.opacity = 1; // 所有卡牌可见
+                    card.style.pointerEvents = 'auto'; // 所有卡牌可交互
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.display = 'block';
+                    
+                    // 更新卡牌点击逻辑，添加预选状态
+                    card.removeEventListener('click', card._clickHandler);
+                    card._clickHandler = function(e) {
+                        if (!isExpanded) {
+                            expandCards();
+                            e.stopPropagation();
+                            return;
+                        }
+                        
+                        // 如果卡牌已预选，则选中
+                        if (this.classList.contains('pre-selected')) {
+                            if (selectedCount < maxCards) {
+                                this.classList.remove('pre-selected'); // 移除预选状态
+                                selectCard(this); // 进行选择
+                            }
+                        } else if (selectedCount < maxCards) {
+                            // 移除其他卡牌的预选状态
+                            document.querySelectorAll('.tarot-card.pre-selected').forEach(card => {
+                                card.classList.remove('pre-selected');
+                            });
+                            
+                            // 设置当前卡牌为预选状态
+                            this.classList.add('pre-selected');
+                            
+                            // 预选状态时，卡牌从扇形中弹出
+                            const currentIndex = parseInt(this.getAttribute('data-index'));
+                            const currentAngle = startAngle + (currentIndex * angleStep);
+                            const currentRadian = (currentAngle * Math.PI) / 180;
+                            const popDistance = 40; // 弹出距离
+                            const popX = centerX + (radius - popDistance) * Math.cos(currentRadian) - (cardWidth / 2);
+                            const popY = centerY + (radius - popDistance) * Math.sin(currentRadian) - cardHeight - 20;
+                            
+                            this.style.left = `${popX}px`;
+                            this.style.top = `${popY - stackOffset}px`; // 保持堆叠偏移
+                            this.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.3)';
+                            this.style.zIndex = 500;
+                        }
+                    };
+                    card.addEventListener('click', card._clickHandler);
+                });
+                
+                // 移除拖动功能
+            }
+            
+            // 选择卡牌
+            function selectCard(card) {
+                if (selectedCount >= maxCards) return;
+                
+                // 获取卡牌的原始位置
+                const cardRect = card.getBoundingClientRect();
+                const position = positions[selectedCount];
+                const positionRect = position.getBoundingClientRect();
+                
+                // 标记卡牌为已选择
+                card.classList.add('selected');
+                
+                // 计算卡牌需要移动的距离
+                const translateX = positionRect.left - cardRect.left + (positionRect.width - cardRect.width) / 2;
+                const translateY = positionRect.top - cardRect.top + (positionRect.height - cardRect.height) / 2;
+                
+                // 移动卡牌到指定位置
+                card.style.zIndex = 1000 + selectedCount;
+                card.style.transition = 'transform 0.5s ease, left 0.5s ease, top 0.5s ease';
+                card.style.transform = 'rotate(0deg)'; // 确保卡牌回正
+                card.style.left = `${card.offsetLeft + translateX}px`;
+                card.style.top = `${card.offsetTop + translateY}px`;
+                
+                // 随机生成不重复的塔罗牌名称
+                let tarotName;
+                do {
+                    // 80%概率抽到小牌，20%概率抽到大牌
+                    if (Math.random() < 0.8) {
+                        // 抽小牌
+                        const suit = tarotData.minorArcana.suits[Math.floor(Math.random() * tarotData.minorArcana.suits.length)];
+                        const value = tarotData.minorArcana.values[Math.floor(Math.random() * tarotData.minorArcana.values.length)];
+                        tarotName = `${suit}${value}`;
+                    } else {
+                        // 抽大牌
+                        tarotName = tarotData.majorArcana[Math.floor(Math.random() * tarotData.majorArcana.length)];
+                    }
+                } while (selectedTarotCards.includes(tarotName));
+                
+                // 添加到已选择的塔罗牌中
+                selectedTarotCards.push(tarotName);
+                
+                // 更新卡牌计数
+                selectedCount++;
+                
+                // 当选择了5张卡牌后，显示消息
+                if (selectedCount === maxCards) {
+                    setTimeout(() => {
+                        // 替换提示框为展示解读界面
+                        showReadingInterface();
+                    }, 600);
+                }
+                
+                // 将卡牌放入占位区
+                setTimeout(() => {
+                    // 清空之前的内容
+                    position.innerHTML = '';
+                    position.style.border = '5px solid #a897c2'; // 淡紫色边框
+                    position.style.borderRadius = '10px';
+                    position.style.position = 'relative'; // 确保子元素可以相对于它定位
+                    position.style.overflow = 'hidden'; // 确保图片不会溢出边界
+                    position.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.2)'; // 添加阴影效果
+                    
+                    // 获取塔罗牌图片路径
+                    const imageUrl = getCardImageFilename(tarotName);
+                    
+                    if (imageUrl) {
+                        // 添加图片元素
+                        const imgElement = document.createElement('img');
+                        imgElement.src = imageUrl;
+                        imgElement.alt = tarotName;
+                        imgElement.style.width = '100%';
+                        imgElement.style.height = '100%';
+                        imgElement.style.objectFit = 'cover';
+                        position.appendChild(imgElement);
+                        
+                        // 添加悬停效果，显示卡牌名称
+                        position.setAttribute('title', tarotName);
+                        
+                        // 图片加载失败时的处理
+                        imgElement.onerror = function() {
+                            console.error(`无法加载图片: ${imageUrl}`);
+                            position.style.backgroundColor = '#f8d568'; // 黄色背景
+                            
+                            // 添加卡牌标识
+                            const symbol = document.createElement('div');
+                            symbol.style.width = '30px';
+                            symbol.style.height = '30px';
+                            symbol.style.backgroundColor = '#a897c2';
+                            symbol.style.clipPath = 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
+                            symbol.style.position = 'absolute';
+                            symbol.style.top = '30%';
+                            symbol.style.left = '50%';
+                            symbol.style.transform = 'translate(-50%, -50%)';
+                            position.appendChild(symbol);
+                            
+                            // 添加塔罗牌名称
+                            const nameElement = document.createElement('div');
+                            nameElement.textContent = tarotName;
+                            nameElement.style.position = 'absolute';
+                            nameElement.style.bottom = '10px';
+                            nameElement.style.left = '50%';
+                            nameElement.style.transform = 'translateX(-50%)';
+                            nameElement.style.fontSize = '0.8rem';
+                            nameElement.style.textAlign = 'center';
+                            nameElement.style.width = '90%';
+                            nameElement.style.fontWeight = 'bold';
+                            position.appendChild(nameElement);
+                        };
+                    } else {
+                        // 没有找到对应图片时，显示默认样式
+                        position.style.backgroundColor = '#f8d568'; // 黄色背景
+                        
+                        // 添加卡牌标识
+                        const symbol = document.createElement('div');
+                        symbol.style.width = '30px';
+                        symbol.style.height = '30px';
+                        symbol.style.backgroundColor = '#a897c2';
+                        symbol.style.clipPath = 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
+                        symbol.style.position = 'absolute';
+                        symbol.style.top = '30%';
+                        symbol.style.left = '50%';
+                        symbol.style.transform = 'translate(-50%, -50%)';
+                        position.appendChild(symbol);
+                        
+                        // 添加塔罗牌名称
+                        const nameElement = document.createElement('div');
+                        nameElement.textContent = tarotName;
+                        nameElement.style.position = 'absolute';
+                        nameElement.style.bottom = '10px';
+                        nameElement.style.left = '50%';
+                        nameElement.style.transform = 'translateX(-50%)';
+                        nameElement.style.fontSize = '0.8rem';
+                        nameElement.style.textAlign = 'center';
+                        nameElement.style.width = '90%';
+                        nameElement.style.fontWeight = 'bold';
+                        position.appendChild(nameElement);
+                    }
+                    
+                    // 隐藏原卡牌
+                    card.style.display = 'none';
+                }, 500);
+            }
+            
+            // 初始生成78张卡牌
+            generateCards(totalCards);
+            
+            // 获取问题参数
+            const question = urlParams.get('q');
+            if (question) {
+                console.log('占卜问题:', question);
+            }
+            
+            // 在线抽牌按钮点击事件
+            onlineDrawingBtn.addEventListener('click', function() {
+                // 如果牌堆未展开，先展开
+                if (!isExpanded) {
+                    expandCards();
+                    return;
+                }
+                
+                // 如果已经选满了卡牌，则不再继续
+                if (selectedCount >= maxCards) {
+                    // 构建卡牌列表
+                    let cardList = '';
+                    for (let i = 0; i < selectedTarotCards.length; i++) {
+                        cardList += `${i+1}. ${selectedTarotCards[i]}\n`;
+                    }
+                    alert(`您已选择${maxCards}张塔罗牌：\n${cardList}\n点击任意占位区查看详细解读结果`);
+                    return;
+                }
+                
+                // 自动抽取剩余卡牌
+                const remainingToSelect = maxCards - selectedCount;
+                const cards = document.querySelectorAll('.tarot-card:not(.selected)');
+                
+                // 随机选择剩余的卡牌
+                for (let i = 0; i < remainingToSelect; i++) {
+                    if (cards.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * cards.length);
+                        setTimeout(() => {
+                            selectCard(cards[randomIndex]);
+                        }, i * 600); // 间隔选牌时间
+                    }
+                }
+            });
+            
+            // 重新抽牌按钮点击事件
+            redrawButton.addEventListener('click', function() {
+                // 简化为刷新页面
+                window.location.reload();
+            });
+            
+            // 点击卡牌占位区，跳转到结果页面
+            positions.forEach((position, index) => {
+                position.addEventListener('click', function() {
+                    if (selectedCount === maxCards) {
+                        // 显示解读界面
+                        showReadingInterface();
+                    } else {
+                        alert(`请先选择${maxCards}张塔罗牌（当前已选择${selectedCount}张）`);
+                    }
+                });
+            });
+            
+            // 显示塔罗牌解读界面
+            function showReadingInterface() {
+                const readingModal = document.getElementById('readingModal');
+                const cardsSummary = document.getElementById('cardsSummary');
+                const readingDate = document.getElementById('readingDate');
+                const readingQuestion = document.getElementById('readingQuestion');
+                
+                // 设置当前日期和时间
+                const now = new Date();
+                const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                readingDate.textContent = now.toLocaleDateString('zh-CN', dateOptions);
+                
+                // 获取URL中的问题参数
+                const question = urlParams.get('q');
+                if (question) {
+                    readingQuestion.textContent = `您的问题: ${decodeURIComponent(question)}`;
+                }
+                
+                // 清空卡牌总结区域
+                cardsSummary.innerHTML = '';
+                
+                // 添加选中的卡牌到总结区域
+                // 定义不同牌阵的牌位名称
+                const spreadPositions = {
+                    'three-card': ['过去', '现在', '未来'],
+                    'cross': ['核心问题', '阻碍', '当前状态', '影响', '可能结果'],
+                    'five-card': ['当前状态', '未来发展', '障碍', '最后结果', '建议']
+                };
+                
+                // 获取当前牌阵类型
+                const spreadType = urlParams.get('spread') || 'five-card'; // 默认为五卡牌阵
+                
+                // 根据牌阵类型选择对应的牌位名称
+                const positionNames = spreadPositions[spreadType] || spreadPositions['five-card'];
+                
+                selectedTarotCards.forEach((cardName, index) => {
+                    const cardSummary = document.createElement('div');
+                    cardSummary.className = 'card-summary';
+                    
+                    const imageUrl = getCardImageFilename(cardName);
+                    const imageHtml = imageUrl ? 
+                        `<img src="${imageUrl}" alt="${cardName}">` : 
+                        `<div style="width:80px;height:120px;background:#1c1347;border-radius:8px;margin:0 auto 10px;display:flex;justify-content:center;align-items:center;color:gold;font-size:0.8rem;">${cardName}</div>`;
+                    
+                    cardSummary.innerHTML = `
+                        ${imageHtml}
+                        <div class="card-name">${cardName}</div>
+                        <div class="card-position-name">${positionNames[index] || `位置${index+1}`}</div>
+                    `;
+                    
+                    cardsSummary.appendChild(cardSummary);
+                });
+                
+                // 显示解读界面
+                readingModal.style.display = 'block';
+                
+                // 设置关闭按钮事件
+                document.getElementById('closeReading').addEventListener('click', function() {
+                    readingModal.style.display = 'none';
+                });
+                
+                // 设置聊天输入和发送功能
+                const chatInput = document.getElementById('chatInput');
+                const sendMessage = document.getElementById('sendMessage');
+                const chatMessages = document.getElementById('chatMessages');
+                
+                // 清空现有的聊天消息并添加初始欢迎消息
+                chatMessages.innerHTML = '';
+                
+                // 添加欢迎消息
+                const welcomeHtml = `
+                    <div class="message">
+                        <div class="message-tarot">
+                            欢迎来到您的塔罗牌解读。我已经看到了您选择的${currentSpreadConfig.maxCards}张卡牌，它们共同描绘了关于您所提问题的能量和指引。
+                        </div>
+                        <div class="message-info message-tarot-info">
+                            塔罗导师 • 刚刚
+                        </div>
+                    </div>
+                `;
+                chatMessages.insertAdjacentHTML('beforeend', welcomeHtml);
+                
+                // 添加第一张牌的解读
+                const firstCardHtml = `
+                    <div class="message">
+                        <div class="message-tarot">
+                            让我们首先来看"${currentSpreadConfig.labels[0]}"牌位上的「世界」牌。这张牌意味着您正处于一个周期的完成阶段，某个目标或项目即将达成。您在事业上付出的努力得到了认可，并且感受到了一种圆满和成就感。
+                        </div>
+                        <div class="message-info message-tarot-info">
+                            塔罗导师 • 刚刚
+                        </div>
+                    </div>
+                `;
+                chatMessages.insertAdjacentHTML('beforeend', firstCardHtml);
+                
+                // 添加用户响应消息
+                const userResponseHtml = `
+                    <div class="message">
+                        <div class="message-user">
+                            这很准确！我最近确实完成了一个重要项目，感觉很有成就感。
+                        </div>
+                        <div class="message-info message-user-info">
+                            您 • 刚刚
+                        </div>
+                    </div>
+                `;
+                chatMessages.insertAdjacentHTML('beforeend', userResponseHtml);
+                
+                // 添加第二张牌的解读
+                const secondCardHtml = `
+                    <div class="message">
+                        <div class="message-tarot">
+                            在"${currentSpreadConfig.labels[1]}"位置上，我们看到了「权杖九」。这张牌表明您将迎来一段丰收期，之前的努力将获得回报。不过请注意，成功带来的同时也可能有更多的责任，您需要做好准备迎接下一阶段的挑战。
+                        </div>
+                        <div class="message-info message-tarot-info">
+                            塔罗导师 • 刚刚
+                        </div>
+                    </div>
+                `;
+                chatMessages.insertAdjacentHTML('beforeend', secondCardHtml);
+                
+                function sendUserMessage() {
+                    const messageText = chatInput.value.trim();
+                    if (!messageText) return;
+                    
+                    // 添加用户消息
+                    const messageHtml = `
+                        <div class="message">
+                            <div class="message-user">
+                                ${messageText}
+                            </div>
+                            <div class="message-info message-user-info">
+                                您 • 刚刚
+                            </div>
+                        </div>
+                    `;
+                    
+                    chatMessages.insertAdjacentHTML('beforeend', messageHtml);
+                    chatInput.value = '';
+                    
+                    // 滚动到底部
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    // 模拟塔罗回复（在实际应用中，这里会调用语言模型API）
+                    setTimeout(() => {
+                        simulateTarotResponse();
+                    }, 1000);
+                }
+                
+                sendMessage.addEventListener('click', sendUserMessage);
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendUserMessage();
+                    }
+                });
+                
+                // 模拟塔罗回复功能
+                function simulateTarotResponse() {
+                    const responses = [
+                        "塔罗牌为您指引的是，此刻您应该更加信任自己的直觉。您所选的卡牌展示了一个强大的内在智慧，等待被释放。",
+                        "我看到您面临的障碍可能与过去的经历有关。这些「障碍」牌位上的能量提示您需要放下过去，才能迎接新的机会。",
+                        "这个组合很有意思，五张卡牌共同指向一个转变期。您似乎正处于一个决策点上，任何选择都将带来深远的影响。",
+                        "根据您抽到的卡牌，特别是在「建议」位置上的牌，现在是采取行动的时候了。不要再等待完美时机，因为机会就在当下。",
+                        "让我们更深入探讨您抽到的卡牌组合。它们展示了一个清晰的能量流动，从当前状态一直到未来的可能性。您准备好迎接这个旅程了吗？"
+                    ];
+                    
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    
+                    const responseHtml = `
+                        <div class="message">
+                            <div class="message-tarot">
+                                ${randomResponse}
+                            </div>
+                            <div class="message-info message-tarot-info">
+                                塔罗导师 • 刚刚
+                            </div>
+                        </div>
+                    `;
+                    
+                    chatMessages.insertAdjacentHTML('beforeend', responseHtml);
+                    
+                    // 滚动到底部
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+                
+                // 设置其他按钮事件
+                document.getElementById('saveReading').addEventListener('click', function() {
+                    alert('解读已保存！（模拟功能）');
+                });
+                
+                document.getElementById('shareReading').addEventListener('click', function() {
+                    alert('分享功能已激活！（模拟功能）');
+                });
+                
+                document.getElementById('newReading').addEventListener('click', function() {
+                    readingModal.style.display = 'none';
+                    window.location.reload(); // 重新加载页面
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

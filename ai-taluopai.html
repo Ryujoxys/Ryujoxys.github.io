@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择你的AI塔罗师 - Tarot09</title>
+    <meta name="description" content="选择您喜欢的AI塔罗师，获得专业的塔罗牌解读和人生指引。">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <style>
+        /* AI塔罗师选择页面专用样式 */
+        .page-header {
+            text-align: center;
+            padding: 30px 0 10px;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .search-bar {
+            max-width: 500px;
+            margin: 0 auto 30px;
+            display: flex;
+            background: #f5f5f5;
+            border-radius: 30px;
+            padding: 8px 15px;
+            align-items: center;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+        }
+        
+        .search-bar button {
+            background: #8A2BE2;
+            border: none;
+            color: white;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        /* 新添加的样式 */
+        .main-title {
+            font-size: 1.4rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .ai-highlight {
+            color: #FF69B4;
+        }
+        
+        .free-counter-box {
+            max-width: 500px;
+            margin: 0 auto 20px;
+            background-color: #f9f9f9;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .free-counter {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .refresh-icon {
+            margin-left: 10px;
+            color: #8A2BE2;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .refresh-icon:hover {
+            transform: rotate(90deg);
+        }
+        
+        .unlock-button {
+            background: #8A2BE2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .unlock-button:hover {
+            background: #7926c9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        .reset-time {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        /* 会员订阅弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .subscription-modal {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.active .subscription-modal {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .modal-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .plan-options {
+            padding: 20px;
+        }
+        
+        .plan-option {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .plan-option:hover, .plan-option.selected {
+            border-color: #8A2BE2;
+            background-color: rgba(138, 43, 226, 0.05);
+        }
+        
+        .plan-option.selected::before {
+            content: " ";
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            width: 10px;
+            height: 10px;
+            background-color: #8A2BE2;
+            border-radius: 50%;
+        }
+        
+        .plan-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .plan-price {
+            color: #8A2BE2;
+        }
+        
+        .plan-description {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #eee;
+        }
+        
+        .modal-footer button {
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .cancel-button {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        
+        .cancel-button:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .subscribe-button {
+            background-color: #8A2BE2;
+            color: white;
+        }
+        
+        .subscribe-button:hover {
+            background-color: #7926c9;
+        }
+        
+        .term-conditions {
+            font-size: 0.75rem;
+            color: #888;
+            text-align: center;
+            padding: 0 20px 20px;
+        }
+        
+        .reader-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .reader-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+        }
+        
+        .reader-image {
+            width: 80px;
+            height: 80px;
+            background-color: #9370DB;
+            border-radius: 10px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .reader-info {
+            flex: 1;
+        }
+        
+        .reader-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .reader-stars {
+            color: gold;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+        
+        .reader-description {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        
+        .select-button {
+            background: #8A2BE2;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 0;
+            width: 100%;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .more-readers {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .more-button {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .feature-section {
+            padding: 40px 0;
+            background: #f9f9f9;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .feature-card h3 {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .feature-card p {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .highlight-features {
+            margin-top: 50px;
+        }
+        
+        .highlight-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .highlight-feature:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        
+        .highlight-image {
+            width: 200px;
+            height: 150px;
+            background: linear-gradient(135deg, #84fab0, #8fd3f4);
+            border-radius: 10px;
+            margin: 0 20px;
+            flex-shrink: 0;
+        }
+        
+        .highlight-content h3 {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .highlight-content p {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .faq-section {
+            padding: 40px 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .faq-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .faq-answer {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .more-features {
+            text-align: center;
+            padding: 80px 0;
+            background-color: #fff;
+        }
+        
+        .more-features h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #222;
+        }
+        
+        .more-features p {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 35px;
+        }
+        
+        .more-features-button {
+            background-color: #8A2BE2;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 13px 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.2);
+        }
+        
+        .more-features-button:hover {
+            background-color: #7926c9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .reader-grid, .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .highlight-feature, .highlight-feature:nth-child(even) {
+                flex-direction: column;
+            }
+            
+            .highlight-image {
+                margin: 0 0 20px 0;
+                width: 100%;
+            }
+        }
+        
+        /* AI塔罗牌高亮样式 */
+        .ai-tarot-highlight {
+            color: #3498db; /* 蓝色 */
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <span>🔮</span>
+                    <span>Tarot09</span>
+                </a>
+            </div>
+            
+            <button class="menu-toggle" aria-label="菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="nav-capsules">
+                <!-- 主导航胶囊 -->
+                <div class="nav-capsule main-nav-capsule">
+                    <div class="nav-menu">
+                        <ul>
+                            <li><a href="index.html" class="nav-link">首页</a></li>
+                            <li><a href="javascript:void(0)" class="nav-link active">AI塔罗占卜</a></li>
+                            <li><a href="yes-no-tarot.html" class="nav-link">是否塔罗占卜</a></li>
+                            <li><a href="javascript:void(0)" class="nav-link premium" id="premiumLink"><i class="fas fa-crown"></i> 会员订阅</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 用户控制胶囊 -->
+                <div class="nav-capsule user-controls-capsule">
+                    <div class="user-controls">
+                        <button class="theme-toggle" aria-label="切换主题">
+                            <i class="fas fa-moon"></i>
+                            <i class="fas fa-sun"></i>
+                        </button>
+                        <button class="language-toggle" aria-label="切换语言">
+                            <i class="fas fa-globe"></i>
+                        </button>
+                        <a href="javascript:void(0)" class="user-profile">
+                            😊
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main>
+        <!-- 页面标题 -->
+        <section class="page-header">
+            <div class="container">
+                <h3 class="main-title">在线塔罗占卜</h3>
+                <h1 class="page-title">选择你的 <span class="ai-highlight">AI</span> 塔罗师</h1>
+                <p class="page-subtitle">通过AI塔罗牌解读，占卜你的命运轨迹</p>
+                
+                <!-- 免费占卜次数显示框 -->
+                <div class="free-counter-box">
+                    <div class="free-counter">
+                        今日剩余免费占卜次数：2次
+                        <span class="refresh-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </span>
+                    </div>
+                    <button class="unlock-button" id="unlockButton">
+                        <i class="fas fa-unlock-alt"></i> 解锁无限次占卜
+                    </button>
+                    <div class="reset-time">
+                        每日 CST 08:00 重置次数
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 塔罗师选择 -->
+        <section class="reader-selection">
+            <div class="container">
+                <h2 class="visually-hidden">塔罗师列表</h2>
+                
+                <div class="reader-grid">
+                    <!-- 塔罗师1 -->
+                    <div class="reader-card">
+                        <div class="reader-image"></div>
+                        <div class="reader-info">
+                            <h3 class="reader-name">神秘先生 <span class="reader-stars">★★★★★</span></h3>
+                            <p class="reader-description">来自东方的神秘塔罗大师，专注于事业和财运方向的分析，能够预测未来发展趋势。</p>
+                            <button class="select-button">选择塔罗师</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 更多塔罗师按钮 -->
+                <div class="more-readers">
+                    <button class="more-button">敬请期待</button>
+                </div>
+                
+                <!-- 服务说明 -->
+                <div class="service-info">
+                    <div class="reader-card" style="margin-bottom: 15px;">
+                        <div class="reader-image"></div>
+                        <div class="reader-info">
+                            <h3 class="reader-name">免费塔罗占卜 2 次</h3>
+                            <p class="reader-description">为新用户提供首次免费占卜服务，体验AI塔罗师的专业解读能力。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="reader-card">
+                        <div class="reader-image"></div>
+                        <div class="reader-info">
+                            <h3 class="reader-name">会员无限次数占卜</h3>
+                            <p class="reader-description">成为会员后可无限次使用所有AI塔罗师服务，并享受高级功能。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 如何使用AI塔罗牌占卜 -->
+        <section class="feature-section">
+            <div class="container">
+                <h2 class="feature-title">如何使用AI塔罗牌占卜?</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>步骤1：选择塔罗师</h3>
+                        <p>从多位AI塔罗师中选择一位符合您需求的塔罗师，每位塔罗师都有不同的专长和解读风格。</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>步骤2：提出具体问题</h3>
+                        <p>明确您想要解答的问题，越具体的问题能得到越精准的解读，帮助您获得更有价值的指引。</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>步骤3：获得塔罗解读</h3>
+                        <p>AI塔罗师会为您抽取塔罗牌并进行详细解读，提供针对您问题的见解和可能的未来发展趋势。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- AI塔罗牌特点 -->
+        <section class="feature-section" style="background-color: white;">
+            <div class="container">
+                <h2 class="feature-title">AI塔罗牌特点</h2>
+                
+                <div class="highlight-features">
+                    <div class="highlight-feature">
+                        <div class="highlight-image"></div>
+                        <div class="highlight-content">
+                            <h3>自动抽取牌阵</h3>
+                            <p>无需手动选牌，AI会为您自动抽取最合适的塔罗牌组合，确保解读的准确性与全面性。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-feature">
+                        <div class="highlight-image"></div>
+                        <div class="highlight-content">
+                            <h3>塔罗在线解读</h3>
+                            <p>无论何时何地，只要连接网络，就能获得专业的塔罗牌解读服务。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-feature">
+                        <div class="highlight-image"></div>
+                        <div class="highlight-content">
+                            <h3>直观式塔罗解读</h3>
+                            <p>AI塔罗师提供清晰直观的解读，以易于理解的方式呈现塔罗牌蕴含的讯息。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-feature">
+                        <div class="highlight-image"></div>
+                        <div class="highlight-content">
+                            <h3>神秘卡牌预测</h3>
+                            <p>融合了传统塔罗牌的神秘力量与现代AI技术，为您提供准确的预测和指引。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-feature">
+                        <div class="highlight-image"></div>
+                        <div class="highlight-content">
+                            <h3>继续追问功能</h3>
+                            <p>解读后如有疑问，可以进一步提问，AI塔罗师会给予更深入的解答，满足您的好奇心。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- AI塔罗牌占卜常见问题 -->
+        <section class="faq-section">
+            <div class="container">
+                <h2 class="faq-title">AI塔罗牌占卜常见问题</h2>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">AI塔罗牌占卜有效果吗？</h3>
+                    <p class="faq-answer">AI塔罗牌占卜结合了传统塔罗牌体系与先进的人工智能技术，通过大数据分析和模式识别，为您提供具有参考价值的解读。虽然不能百分之百预测未来，但可以帮助您从不同角度思考问题，获得有益的启示。</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">如何提高AI塔罗占卜的准确性？</h3>
+                    <p class="faq-answer">提出具体明确的问题，保持开放的心态，并在解读过程中结合自身实际情况理解塔罗牌的寓意，这样能够获得更加准确和有价值的解读结果。</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">塔罗牌可以预测时间吗？</h3>
+                    <p class="faq-answer">AI塔罗占卜可以提供事件发展的大致时间框架，但准确的时间预测受多种因素影响。塔罗牌更侧重于揭示事件的发展趋势和可能的结果，而不是精确的时间点。</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">塔罗牌占卜反映的是必然结果吗？</h3>
+                    <p class="faq-answer">塔罗牌展示的是当前能量和趋势下可能的结果，而非不可改变的命运。您始终拥有自由意志，可以根据塔罗牌的指引做出更明智的选择，从而改变未来的走向。</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">占卜后多久可以再次占卜同一问题？</h3>
+                    <p class="faq-answer">一般建议同一问题间隔2-4周再次占卜，给予足够的时间让情况发展。频繁占卜同一问题可能导致解读混乱，除非情况有明显变化。会员用户可根据需要灵活安排占卜次数。</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 更多功能 -->
+        <section class="more-features">
+            <div class="container">
+                <h2>更多 <span class="ai-tarot-highlight">AI塔罗牌</span> 功能</h2>
+                <p>体验2025最新在线塔罗抽牌系统和塔罗占卜测验</p>
+                <button class="more-features-button" id="exploreMoreButton">探索更多在线AI塔罗牌玩法</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    © 2023 AI塔罗牌 - 版权所有
+                </div>
+                <div class="footer-links">
+                    <a href="javascript:void(0)">关于我们</a>
+                    <a href="javascript:void(0)">隐私政策</a>
+                    <a href="javascript:void(0)">使用条款</a>
+                    <a href="javascript:void(0)">联系我们</a>
+                    <a href="javascript:void(0)">问题反馈</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 会员订阅弹窗 -->
+    <div class="modal-overlay" id="subscriptionModal">
+        <div class="subscription-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">升级会员</h3>
+                <p class="modal-subtitle">享受无限次塔罗占卜和更多高级功能</p>
+            </div>
+            
+            <div class="plan-options">
+                <div class="plan-option" data-plan="monthly">
+                    <div class="plan-name">
+                        月度会员 <span class="plan-price">¥18.00</span>
+                    </div>
+                    <p class="plan-description">每月自动续费，随时可取消</p>
+                </div>
+                
+                <div class="plan-option selected" data-plan="quarterly">
+                    <div class="plan-name">
+                        季度会员 <span class="plan-price">¥48.00</span>
+                    </div>
+                    <p class="plan-description">每三个月自动续费，相当于每月¥16.00</p>
+                </div>
+                
+                <div class="plan-option" data-plan="yearly">
+                    <div class="plan-name">
+                        年度会员 <span class="plan-price">¥168.00</span>
+                    </div>
+                    <p class="plan-description">每年自动续费，相当于每月¥14.00，最划算</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="cancel-button" id="cancelSubscription">取消</button>
+                <button class="subscribe-button" id="confirmSubscription">确认订阅</button>
+            </div>
+            
+            <div class="term-conditions">
+                <p>订阅即表示您同意我们的服务条款和隐私政策。可在到期前24小时取消自动续订。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入订阅模块脚本 -->
+    <script src="js/subscription.js"></script>
+    <!-- 导入测试脚本 -->
+    <script src="js/test-subscription.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取所有链接
+            var links = document.querySelectorAll('a');
+            
+            // 将所有链接更改为无效链接，但保留首页链接和塔罗师选择链接
+            links.forEach(function(link) {
+                var href = link.getAttribute('href');
+                if (href !== 'javascript:void(0)' && href !== 'index.html' && href !== 'tarot-question.html') {
+                    link.setAttribute('href', 'javascript:void(0)');
+                }
+            });
+            
+            // 塔罗师选择按钮事件
+            var selectButtons = document.querySelectorAll('.select-button');
+            selectButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    // 点击后跳转到问题输入页面
+                    window.location.href = 'tarot-question.html';
+                });
+            });
+            
+            // 更多塔罗师按钮事件
+            var moreButton = document.querySelector('.more-button');
+            if (moreButton) {
+                moreButton.addEventListener('click', function() {
+                    alert('加载更多塔罗师...');
+                });
+            }
+            
+            // 探索更多按钮点击事件
+            const exploreMoreButton = document.getElementById('exploreMoreButton');
+            if (exploreMoreButton) {
+                exploreMoreButton.addEventListener('click', function() {
+                    // 这里可以跳转到更多AI塔罗牌玩法的页面
+                    // 暂时用alert模拟
+                    alert('即将为您展示更多AI塔罗牌玩法和功能！');
+                    // 未来可以替换为: window.location.href = "more-tarot-features.html";
+                });
+            }
+            
+            // 刷新图标点击
+            const refreshIcon = document.querySelector('.refresh-icon');
+            if (refreshIcon) {
+                refreshIcon.addEventListener('click', function() {
+                    this.querySelector('i').classList.add('fa-spin');
+                    
+                    // 模拟刷新，1秒后停止旋转
+                    setTimeout(() => {
+                        this.querySelector('i').classList.remove('fa-spin');
+                    }, 1000);
+                });
+            }
+            
+            // 语言切换按钮功能
+            const languageToggle = document.querySelector('.language-toggle');
+            if (languageToggle) {
+                languageToggle.addEventListener('click', function() {
+                    // 切换到英文版
+                    window.location.href = 'ai-taluopai-eng.html';
+                });
+            }
+        });
+    </script>
+    <!-- 导入导航栏模块脚本 -->
+    <script src="js/navbar.js"></script>
+</body>
+</html> 

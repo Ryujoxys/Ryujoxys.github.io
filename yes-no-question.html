@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>是否问题占卜 - Tarot09</title>
+    <meta name="description" content="输入您的是否问题，获得塔罗牌的指引与启示。">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <style>
+        /* 是否问题页面专用样式 */
+        .question-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #f9f9f9;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .question-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .question-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .question-subtitle {
+            color: #777;
+            font-size: 1.1rem;
+        }
+        
+        .question-form {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #8A2BE2;
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+        }
+        
+        .question-examples {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .examples-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .examples-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .examples-list li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+            color: #555;
+        }
+        
+        .examples-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #8A2BE2;
+        }
+        
+        .examples-list li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #8A2BE2;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .submit-btn:hover {
+            background-color: #7926c9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        .notes {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f3f3f3;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .notes-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        @media (max-width: 768px) {
+            .question-container {
+                padding: 30px 20px;
+                margin: 30px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <span>🔮</span>
+                    <span>Tarot09</span>
+                </a>
+            </div>
+            
+            <button class="menu-toggle" aria-label="菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="nav-capsules">
+                <!-- 主导航胶囊 -->
+                <div class="nav-capsule main-nav-capsule">
+                    <div class="nav-menu">
+                        <ul>
+                            <li><a href="index.html" class="nav-link">首页</a></li>
+                            <li><a href="ai-taluopai.html" class="nav-link">AI塔罗占卜</a></li>
+                            <li><a href="yes-no-tarot.html" class="nav-link active">是否塔罗占卜</a></li>
+                            <li><a href="javascript:void(0)" class="nav-link premium" id="premiumLink"><i class="fas fa-crown"></i> 会员订阅</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 用户控制胶囊 -->
+                <div class="nav-capsule user-controls-capsule">
+                    <div class="user-controls">
+                        <button class="theme-toggle" aria-label="切换主题">
+                            <i class="fas fa-moon"></i>
+                            <i class="fas fa-sun"></i>
+                        </button>
+                        <button class="language-toggle" aria-label="切换语言">
+                            <i class="fas fa-globe"></i>
+                        </button>
+                        <a href="javascript:void(0)" class="user-profile">
+                            😊
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main>
+        <div class="question-container">
+            <div class="question-header">
+                <h1 class="question-title">输入您的是否问题</h1>
+                <p class="question-subtitle">让塔罗牌为您指明方向</p>
+            </div>
+            
+            <form class="question-form" id="questionForm">
+                <div class="form-group">
+                    <label for="question" class="form-label">您的是否问题</label>
+                    <input type="text" id="question" name="question" class="form-control" placeholder="例如：我是否应该接受这份工作？" required>
+                </div>
+                
+                <div class="question-examples">
+                    <h3 class="examples-title">问题示例：</h3>
+                    <ul class="examples-list">
+                        <li>我是否适合接受当前的工作机会？</li>
+                        <li>现在是否是开始新关系的好时机？</li>
+                        <li>我是否应该搬到新城市？</li>
+                        <li>这个决定是否对我的长期发展有利？</li>
+                        <li>我当前的方向是否正确？</li>
+                    </ul>
+                </div>
+                
+                <button type="submit" class="submit-btn">抽取塔罗牌</button>
+            </form>
+            
+            <div class="notes">
+                <h4 class="notes-title">提示：</h4>
+                <p>为获得最准确的指引，请确保您的问题清晰明确，并且可以简单回答"是"或"否"。在提问前，花点时间深呼吸，集中注意力，这将帮助您与塔罗牌建立更好的能量连接。</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    © 2023 AI塔罗牌 - 版权所有
+                </div>
+                <div class="footer-links">
+                    <a href="javascript:void(0)">关于我们</a>
+                    <a href="javascript:void(0)">隐私政策</a>
+                    <a href="javascript:void(0)">使用条款</a>
+                    <a href="javascript:void(0)">联系我们</a>
+                    <a href="javascript:void(0)">问题反馈</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 会员订阅弹窗 -->
+    <div class="modal-overlay" id="subscriptionModal">
+        <div class="subscription-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">升级会员</h3>
+                <p class="modal-subtitle">享受无限次塔罗占卜和更多高级功能</p>
+            </div>
+            
+            <div class="plan-options">
+                <div class="plan-option" data-plan="monthly">
+                    <div class="plan-name">
+                        月度会员 <span class="plan-price">¥18.00</span>
+                    </div>
+                    <p class="plan-description">每月自动续费，随时可取消</p>
+                </div>
+                
+                <div class="plan-option selected" data-plan="quarterly">
+                    <div class="plan-name">
+                        季度会员 <span class="plan-price">¥48.00</span>
+                    </div>
+                    <p class="plan-description">每三个月自动续费，相当于每月¥16.00</p>
+                </div>
+                
+                <div class="plan-option" data-plan="yearly">
+                    <div class="plan-name">
+                        年度会员 <span class="plan-price">¥168.00</span>
+                    </div>
+                    <p class="plan-description">每年自动续费，相当于每月¥14.00，最划算</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="cancel-button" id="cancelSubscription">取消</button>
+                <button class="subscribe-button" id="confirmSubscription">确认订阅</button>
+            </div>
+            
+            <div class="term-conditions">
+                <p>订阅即表示您同意我们的服务条款和隐私政策。可在到期前24小时取消自动续订。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入订阅模块脚本 -->
+    <script src="js/subscription.js"></script>
+    <!-- 导入测试脚本 -->
+    <script src="js/test-subscription.js"></script>
+    <!-- 导入导航栏模块脚本 -->
+    <script src="js/navbar.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionForm = document.getElementById('questionForm');
+            
+            // 表单提交事件
+            questionForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const question = document.getElementById('question').value.trim();
+                if (!question) {
+                    alert('请输入您的是否问题！');
+                    return;
+                }
+                
+                // 将问题作为URL参数传递到结果页面
+                window.location.href = `yes-no-result.html?q=${encodeURIComponent(question)}`;
+            });
+            
+            // 点击示例问题，填充到输入框
+            const exampleQuestions = document.querySelectorAll('.examples-list li');
+            exampleQuestions.forEach(example => {
+                example.addEventListener('click', function() {
+                    document.getElementById('question').value = this.textContent;
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
