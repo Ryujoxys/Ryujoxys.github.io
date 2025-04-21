@@ -105,7 +105,7 @@
                     <div class="text-content">
                         <h2 class="section-title feature-title">Yes/No Tarot Reading</h2>
                         <p class="section-description">Get intelligent guidance from online tarot through simple yes or no questions</p>
-                        <a href="taluopai-zhanbu.html" class="action-button purple-sm-button">
+                        <a href="yes-no-tarot.html" class="action-button purple-sm-button">
                             Free Tarot Reading Now
                         </a>
                     </div>
@@ -243,7 +243,7 @@
             // Change all links to invalid links, but preserve AI Tarot Reading link
             links.forEach(function(link) {
                 var href = link.getAttribute('href');
-                if (href !== 'javascript:void(0)' && href !== 'ai-taluopai.html') {
+                if (href !== 'javascript:void(0)' && href !== 'ai-taluopai.html' && href !== 'yes-no-tarot.html') {
                     link.setAttribute('href', 'javascript:void(0)');
                 }
             });

@@ -105,7 +105,7 @@
                     <div class="text-content">
                         <h2 class="section-title feature-title">是否塔罗牌占卜</h2>
                         <p class="section-description">通过简单的是否问题，获得在线塔罗的智能指引</p>
-                        <a href="taluopai-zhanbu.html" class="action-button purple-sm-button">
+                        <a href="yes-no-tarot.html" class="action-button purple-sm-button">
                             立即免费塔罗占卜
                         </a>
                     </div>
@@ -243,7 +243,7 @@
             // 将所有链接更改为无效链接，但保留AI塔罗占卜链接
             links.forEach(function(link) {
                 var href = link.getAttribute('href');
-                if (href !== 'javascript:void(0)' && href !== 'ai-taluopai.html') {
+                if (href !== 'javascript:void(0)' && href !== 'ai-taluopai.html' && href !== 'yes-no-tarot.html') {
                     link.setAttribute('href', 'javascript:void(0)');
                 }
             });
