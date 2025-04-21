@@ -802,7 +802,7 @@
             // Change all links to invalid links except home page and tarot reader selection
             links.forEach(function(link) {
                 var href = link.getAttribute('href');
-                if (href !== 'javascript:void(0)' && href !== 'ai-taluopai-eng.html' && href !== 'yes-no-tarot.html') {
+                if (href !== 'javascript:void(0)' && href !== 'ai-taluopai-eng.html' && href !== 'yes-no-tarot.html' && href !== 'index-eng.html') {
                     link.setAttribute('href', 'javascript:void(0)');
                 }
             });
